@@ -16,16 +16,29 @@ def exit_():
     print("Bye!")
     exit(0)
 
+def check_luhn(number):
+    numbers = list(number)
+    for i in range(0, len(numbers)):
+        if i % 2 == 0:
+            numbers[i] = int(numbers[i]) * 2
+    sum = 0
+    for n in numbers:
+        if int(n) > 9:
+            n = int(n) - 9
+        sum += int(n)
+    return (10 - int(sum) % 10) % 10
+
 def create():
     global cards
-    number = "400000" + str(random.randint(1000000000, 9999999999))
-    pin = str(random.randint(1000, 9999))
+    number = "400000" + str(random.randint(100000000, 999999999))
+    number += str(check_luhn(number))
+    pin = random.randint(0, 9999)
     cards.append(Card(number, pin))
     print("Your card has been created")
     print("Your card number:")
     print(number)
     print("Your card PIN:")
-    print(pin)
+    print("%04i" % pin)
 
 def account(card):
     print("1. Balance")
@@ -47,7 +60,7 @@ def log_in():
     print("Enter your card number:")
     number = input()
     print("Enter your PIN:")
-    pin = input()
+    pin = int(input())
     new_card = Card(number, pin)
     dont_exist = True
     for card in cards:
@@ -76,4 +89,5 @@ def menu():
         exit_()
 
 cards = []
-menu()
+#menu()
+print(check_luhn("400000261634864"))
