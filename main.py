@@ -1,8 +1,13 @@
 import random
+import sqlite3
+
+connection = sqlite3.connect('card.s3db')
+cursor = connection.cursor()
+cursor.execute("CREATE TABLE IF NOT EXIST cards ()")
 
 class Card:
-    def __init__(self, number, pin):
-        self.number = number
+    def __init__(self, id, pin):
+        self.id = id
         self.pin = pin
         self.balance = 0
 
@@ -10,33 +15,34 @@ class Card:
         print("Balance: " + str(self.balance))
 
     def __eq__(self, other):
-        return self.number == other.number and self.pin == other.pin
+        return self.id == other.id and self.pin == other.pin
 
 def exit_():
     print("Bye!")
     exit(0)
 
-def check_luhn(number):
-    numbers = list(number)
-    for i in range(0, len(numbers)):
-        if i % 2 == 0:
-            numbers[i] = int(numbers[i]) * 2
+def check_luhn(id):
+    ids = list(id)
     sum = 0
-    for n in numbers:
-        if int(n) > 9:
-            n = int(n) - 9
-        sum += int(n)
-    return (10 - int(sum) % 10) % 10
+    map(int, ids)
+    for i in range(len(ids)):
+        if i % 2 == 0:
+            ids[i] *= 2
+        if ids[i] > 9:
+            sum += ids[i] - 9
+        else:
+            sum += ids[i]
+    return (10 - sum % 10) % 10
 
 def create():
     global cards
-    number = "400000" + str(random.randint(100000000, 999999999))
-    number += str(check_luhn(number))
+    id = (4000000000000000 + random.randint(100000000, 999999999)) * 10
+    id += check_luhn(id)
     pin = random.randint(0, 9999)
-    cards.append(Card(number, pin))
+    cards.append(Card(id, pin))
     print("Your card has been created")
-    print("Your card number:")
-    print(number)
+    print("Your card id:")
+    print(id)
     print("Your card PIN:")
     print("%04i" % pin)
 
@@ -57,11 +63,11 @@ def account(card):
         exit_()
 
 def log_in():
-    print("Enter your card number:")
-    number = input()
+    print("Enter your card id:")
+    id = input()
     print("Enter your PIN:")
     pin = int(input())
-    new_card = Card(number, pin)
+    new_card = Card(id, pin)
     dont_exist = True
     for card in cards:
         if card == new_card:
@@ -69,7 +75,7 @@ def log_in():
             account(card)
             dont_exist = False
     if dont_exist:
-        print("Wrong card number or PIN!")
+        print("Wrong card id or PIN!")
 
 
 def menu():
